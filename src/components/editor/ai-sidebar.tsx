@@ -78,7 +78,7 @@ function RunTracker({ runId, publicToken, onTerminal }: RunTrackerProps) {
     if (!(TERMINAL_STATUSES as readonly string[]).includes(run.status)) return
     firedRef.current = true
     onTerminal(run.status, run.output)
-  }, [run?.status, run?.id, onTerminal])
+  }, [run, onTerminal])
 
   return null
 }
@@ -161,7 +161,10 @@ export function AiSidebar({ isOpen, onClose, roomId, projectId }: AiSidebarProps
   // Fetch specs when sidebar opens
   useEffect(() => {
     if (!isOpen) return
-    fetchSpecs()
+    const task = Promise.resolve().then(fetchSpecs)
+    return () => {
+      void task
+    }
   }, [isOpen, fetchSpecs])
 
   const handleSpecRunTerminal = useCallback(
