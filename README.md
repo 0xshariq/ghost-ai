@@ -31,7 +31,7 @@ Ghost AI is a collaborative system design workspace for turning plain-English id
 The app keeps each concern in its own boundary:
 
 ```text
-app/                         Next.js routes, pages, and API handlers
+src/app/                      Next.js routes, pages, and API handlers
 src/components/              Editor UI and canvas composition
 src/hooks/                   Client-side interaction and autosave hooks
 src/lib/                     Prisma, access control, Liveblocks, and utilities
@@ -71,7 +71,14 @@ Project metadata and relationships are stored in PostgreSQL. Large generated art
 
 3. Add the environment variables listed below to `.env.local`.
 
-4. Start the Next.js development server:
+4. Generate the Prisma client and apply the development database migration:
+
+   ```bash
+   npm run prisma:generate
+   npm run prisma:migrate
+   ```
+
+5. Start the Next.js development server:
 
    ```bash
    npm run dev

@@ -20,9 +20,10 @@ interface PresenceCursorParticipant {
 interface PresenceCursorProps {
   other: PresenceCursorParticipant
   containerRef: React.RefObject<HTMLDivElement | null>
+  viewport: ReturnType<typeof useViewport>
 }
 
-function PresenceCursor({ other, containerRef }: PresenceCursorProps) {
+function PresenceCursor({ other, containerRef, viewport }: PresenceCursorProps) {
   const { flowToScreenPosition } = useReactFlow()
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
   const cursor = other.presence.cursor
@@ -36,7 +37,7 @@ function PresenceCursor({ other, containerRef }: PresenceCursorProps) {
     const rect = containerRef.current.getBoundingClientRect()
     const screen = flowToScreenPosition(cursor)
     setPosition({ x: screen.x - rect.left, y: screen.y - rect.top })
-  }, [containerRef, cursor, flowToScreenPosition])
+  }, [containerRef, cursor, flowToScreenPosition, viewport])
 
   if (!position) return null
 
@@ -59,12 +60,17 @@ function PresenceCursor({ other, containerRef }: PresenceCursorProps) {
 export function PresenceCursors() {
   const containerRef = useRef<HTMLDivElement>(null)
   const others = useOthers()
-  useViewport()
+  const viewport = useViewport()
 
   return (
     <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden">
       {others.map((other) => (
-        <PresenceCursor key={other.connectionId} other={other} containerRef={containerRef} />
+        <PresenceCursor
+          key={other.connectionId}
+          other={other}
+          containerRef={containerRef}
+          viewport={viewport}
+        />
       ))}
     </div>
   )

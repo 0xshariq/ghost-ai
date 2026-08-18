@@ -6,7 +6,7 @@ Update this file whenever the current phase, active feature, or implementation s
 - Maintenance pass — complete
 
 ## Current Goal
-- Feature 29 (TBD)
+- Maintenance follow-up: keep project documentation, generated artifacts, and collaboration behavior aligned.
 
 ## Completed
 
