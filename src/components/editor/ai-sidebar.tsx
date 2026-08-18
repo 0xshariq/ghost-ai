@@ -78,7 +78,7 @@ function RunTracker({ runId, publicToken, onTerminal }: RunTrackerProps) {
     if (!(TERMINAL_STATUSES as readonly string[]).includes(run.status)) return
     firedRef.current = true
     onTerminal(run.status, run.output)
-  }, [run?.status, run?.id, onTerminal])
+  }, [run, onTerminal])
 
   return null
 }
@@ -149,19 +149,32 @@ export function AiSidebar({ isOpen, onClose, roomId, projectId }: AiSidebarProps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchSpecs = useCallback(() => {
-    setSpecsLoading(true)
-    fetch(`/api/projects/${projectId}/specs`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: unknown) => setSpecs(Array.isArray(data) ? (data as SpecItem[]) : []))
-      .catch(() => setSpecs([]))
-      .finally(() => setSpecsLoading(false))
-  }, [projectId])
+  const fetchSpecs = useCallback(
+    async (signal?: AbortSignal) => {
+      setSpecsLoading(true)
+      try {
+        const res = await fetch(`/api/projects/${projectId}/specs`, { signal })
+        if (signal?.aborted) return
+        const data: unknown = res.ok ? await res.json() : []
+        if (!signal?.aborted) {
+          setSpecs(Array.isArray(data) ? (data as SpecItem[]) : [])
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return
+        if (!signal?.aborted) setSpecs([])
+      } finally {
+        if (!signal?.aborted) setSpecsLoading(false)
+      }
+    },
+    [projectId]
+  )
 
   // Fetch specs when sidebar opens
   useEffect(() => {
     if (!isOpen) return
-    fetchSpecs()
+    const controller = new AbortController()
+    void Promise.resolve().then(() => fetchSpecs(controller.signal))
+    return () => controller.abort()
   }, [isOpen, fetchSpecs])
 
   const handleSpecRunTerminal = useCallback(

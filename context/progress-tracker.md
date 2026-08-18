@@ -3,10 +3,10 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Feature 28 (Spec Persistence & Download) — complete
+- Maintenance pass — complete
 
 ## Current Goal
-- Feature 29 (TBD)
+- Maintenance follow-up: keep project documentation, generated artifacts, and collaboration behavior aligned.
 
 ## Completed
 
@@ -40,6 +40,7 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 27 (Spec Generation Flow): app/api/ai/spec/route.ts — POST accepts roomId/chatHistory/nodes/edges, authenticates via Clerk, resolves projectId from roomId using getAccessibleProject (no client-supplied projectId), triggers generate-spec task, creates TaskRun record, returns runId. app/api/ai/spec/token/route.ts — POST accepts runId, verifies TaskRun ownership, issues Trigger.dev public token scoped to that run with 1-hour expiry. trigger/generate-spec.ts — schemaTask (id "generate-spec") with Zod-validated payload (projectId/roomId/chatHistory/nodes/edges); uses Gemini gemini-2.0-flash via @ai-sdk/google generateText to produce a structured Markdown spec from canvas context and chat history; tracks status/specLength in run metadata; returns { spec } as plain Markdown string. `npm run build` passes clean.
 - Feature 29 (Spec UI Integration): GET /api/projects/[projectId]/specs lists specs for a project; GET /api/projects/[projectId]/specs/[specId] returns spec content as text/markdown for preview (not as attachment). ai-sidebar.tsx Specs tab: fetches spec list when sidebar opens, renders clickable compact list with filename/createdAt, download button per item; preview Dialog (base-ui) shows spec content rendered via react-markdown with dark-theme styling; download action creates a temporary anchor to the download endpoint and lets the browser handle the file. react-markdown ^10.1.0 installed. Build clean.
 - Feature 28 (Spec Persistence & Download): ProjectSpec Prisma model added (id, projectId, filePath, createdAt; relation to Project with cascade delete; index on projectId); migration applied and client regenerated. trigger/generate-spec.ts updated to upload generated Markdown to Vercel Blob (specs/{projectId}/{timestamp}.md, private access) and create a ProjectSpec record, returning specId alongside spec. app/api/projects/[projectId]/specs/[specId]/download/route.ts — GET authenticates user, verifies project access via userHasProjectAccess, verifies spec belongs to project, fetches file from Vercel Blob and streams it back as a Markdown attachment (Content-Disposition: attachment). Returns 401/403/404 on error cases. `npm run build` passes clean.
+- Maintenance pass: fixed all ESLint errors in Liveblocks type declarations, deferred spec loading from the sidebar effect, corrected realtime cursor positioning to avoid reading refs during render, added baseline deployment security headers, added Prisma convenience scripts, and replaced the tutorial-oriented README with project-specific documentation.
 
 ## In Progress
 
